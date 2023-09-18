@@ -1,71 +1,73 @@
 import chess
 import chess.svg
 import random
+inf = 100000000
 
-# Evaluation function (simple material count)
-def evaluate_board(board, player):
-    score = 0
-    for square in chess.SQUARES:
-        piece = board.piece_at(square)
-        if piece is None:
-            continue
-        if piece.color == chess.WHITE:
-            if(player):
-                score += piece_value[piece.piece_type][square]
-            else:
-                score += piece_value_1[piece.piece_type][square]
-        else:
-            if player:
-                score -= piece_value[piece.piece_type][(7-square//8)*8+square%8]
-            else:
-                score -= piece_value_1[piece.piece_type][(7-square//8)*8+square%8]
-    return score
+# print(board)
+'''
+board.push(chess.Move.from_uci("e2e4"))
+board.push(chess.Move.from_uci("h7h5"))
+board.push(chess.Move.from_uci("d1h5"))
+board.push(chess.Move.from_uci("h8h5"))
+'''
 
-# Minimax algorithm with Alpha-Beta Pruning
-def minimax(board, depth, alpha, beta, maximizing_player):
-    if depth == 0 or board.is_game_over():
-        return evaluate_board(board, maximizing_player)
-    legal_moves = board.legal_moves
-    legal_moves = random.shuffle(legal_moves)
-    if maximizing_player:
-        max_eval = float("-inf")
-        for move in legal_moves:
-            board.push(move)
-            eval = minimax(board, depth - 1, alpha, beta, False)
-            board.pop()
-            max_eval = max(max_eval, eval)
-            alpha = max(alpha, eval)
-            if beta <= alpha:
-                break
-        return max_eval
-    else:
-        min_eval = float("inf")
-        for move in legal_moves:
-            board.push(move)
-            eval = minimax(board, depth - 1, alpha, beta, True)
-            board.pop()
-            min_eval = min(min_eval, eval)
-            beta = min(beta, eval)
-            if beta <= alpha:
-                break
-        return min_eval
+#print(board.turn) get the turn
 
-# Find the best move using Minimax with Alpha-Beta Pruning
-def best_move(board, depth):
-    best_move = None
-    max_eval = float("-inf")
-    legal_moves = board.legal_moves
-    legal_moves = random.shuffle(legal_moves)
-    for move in legal_moves:
-        board.push(move)
-        eval = minimax(board, depth - 1, float("-inf"), float("inf"), False)
-        board.pop()
-        if eval > max_eval:
-            max_eval = eval
-            best_move = move
-    return best_move
+'''
+movement = chess.Move.from_uci("g1f3")
+if (movement in board.legal_moves):
+    print('---------------------------')
+    board.push(movement)  # Make the move
+    print(board)
+else: print('illegal move')
+#checking move
+'''
 
-# Piece values (simple material count)
+#print(board.outcome())
+# detailed outcome check out document for more
+# document got stuff like who win, why win, why draw, etc
+
+#print(board.is_game_over())
+# is it ended ?
+
+#print(board.has_insufficient_material(True))
+# return to False if white (True) can still win the game
+# we may want to avoid state when we cant win the game ==> negative factor here
+
+#print(board.can_claim_draw())
+# Checks if the player to move can claim a draw by the fifty-move rule or by threefold repetition.
+
+'''
+piece = board.piece_at(8)
+print(piece,'?')
+if (piece.piece_type == chess.KNIGHT):
+    print('yesssss')
+else: print('noooooo')
+print(chess.KNIGHT)
+print(piece.color)
+# get the piece at position 0,1,2,3,4,5,....63 (A1 = 0, B1 = 1,..)
+'''
+
+#legal_moves = list(board.legal_moves)
+#print(legal_moves)
+# convert legal move to a list and iterate through it
+
+#possible_knight_attack = list(board.attacks(1))
+#print(possible_knight_attack)
+# get possible attack of a cell on board
+# same for is_attacked_by
+
+'''
+print('--------------------------')
+board.pop()
+print(board)
+# pop the last move, backtrack need this for sure
+'''
+
+#board.peek()
+# get the last move, not remove that move
+
+###--------------------------Here come the code-----------------------###
 piece_value = {
     chess.PAWN: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, -3, -3, 0, 1, 1, 1, -1, -2, 0, 0, -2, -1, 1, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 1, 1, 2, 3, 3, 2, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0],
     chess.KNIGHT: [-50, -40, -30, -30, -30, -30, -40, -50, -40, -20, 0, 5, 5, 0, -20, -40, -30, 5, 10, 15, 15, 10, 5, -30, -30, 0, 15, 20, 20, 15, 0, -30, -30, 5, 15, 20, 20, 15, 5, -30, -30, 0, 10, 15, 15, 10, 0, -30, -40, -20, 0, 0, 0, 0, -20, -40, -50, -40, -30, -30, -30, -30, -40, -50],
@@ -74,40 +76,232 @@ piece_value = {
     chess.QUEEN: [-20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 5, 0, 0, 0, 0, -10, -10, 5, 5, 5, 5, 5, 0, -10, 0, 0, 5, 5, 5, 5, 0, -5, -5, 0, 5, 5, 5, 5, 0, -5, -10, 0, 5, 5, 5, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -5, -5, -10, -10, -20],
     chess.KING: [-30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -20, -30, -30, -40, -40, -30, -30, -20, -10, -20, -20, -20, -20, -20, -20, -10, 20, 20, 0, 0, 0, 0, 20, 20, 20, 30, 10, 0, 0, 10, 30, 20]  # King value is often set to 0 in simple evaluations
 }
-piece_value_1 = {
-    chess.PAWN: [0, 0, 0, 0, 0, 0, 0, 0, -31, 8, -7, -37, -36, -14, 3, -31, -22, 9, 5, -11, -10, -2, 3, -19, -26, 3, 10, 9, 6, 1, 0, -23, -17, 16, -2, 15, 14, 0, 15, -13, 7, 29, 21, 44, 40, 31, 44, 7, 78, 83, 86, 73, 102, 82, 85, 90, 100, 100, 100, 100, 105, 100, 100, 100],
-    chess.KNIGHT: [-74, -23, -26, -24, -19, -35, -22, -69, -23, -15, 2, 0, 2, 0, -23, -20, -18, 10, 13, 22, 18, 15, 11, -14, -1, 5, 31, 21, 22, 35, 2, 0, 24, 24, 45, 37, 33, 41, 25, 17, 10, 67, 1, 74, 73, 27, 62, -2, -3, -6, 100, -36, 4, 62, -4, -14, -66, -53, -75, -75, -10, -55, -58, -70],
-    chess.BISHOP: [-7, 2, -15, -12, -14, -15, -10, -10, 19, 20, 11, 6, 7, 6, 20, 16, 14, 25, 24, 15, 8, 25, 20, 15, 13, 10, 17, 23, 17, 16, 0, 7, 25, 17, 20, 34, 26, 25, 15, 10, -9, 39, -32, 41, 52, -10, 28, -14, -11, 20, 35, -42, -39, 31, 2, -22, -59, -78, -82, -76, -23, -107, -37, -50],
-    chess.ROOK: [-30, -24, -18, 5, -2, -18, -31, -32, -53, -38, -31, -26, -29, -43, -44, -53, -42, -28, -42, -25, -25, -35, -26, -46, -28, -35, -16, -21, -13, -29, -46, -30, 0, 5, 16, 13, 18, -4, -9, -6, 19, 35, 28, 33, 45, 27, 25, 15, 55, 29, 56, 67, 55, 62, 34, 60, 35, 29, 33, 4, 37, 33, 56, 50],
-    chess.QUEEN: [-39, -30, -31, -13, -31, -36, -34, -42, -36, -18, 0, -19, -15, -15, -21, -38, -30, -6, -13, -11, -16, -11, -16, -27, -14, -15, -2, -5, -1, -10, -20, -22, 1, -16, 22, 17, 25, 20, -13, -6, -2, 43, 32, 60, 72, 63, 43, 2, 14, 32, 60, -10, 20, 76, 57, 24, 6, 1, -8, -104, 69, 24, 88, 26],
-    chess.KING:[17, 30, -3, -14, 6, -1, 40, 18, -4, 3, -14, -50, -57, -18, 13, 4, -47, -42, -43, -79, -64, -32, -29, -32, -55, -43, -52, -28, -51, -47, -8, -50, -55, 50, 11, -4, -19, 13, 0, -49, -62, 12, -57, 44, -67, 28, 37, -31, -32, 10, 55, 56, 56, 55, 10, 3, 4, 54, 47, -99, -99, 60, 83, -62]  # King value is often set to 0 in simple evaluations
-}
 
-# Initialize the chessboard
+def detect_end_score(board):
+    outcome = board.outcome()
+    if (outcome.winner == True): return inf
+    elif (outcome.winner == False): return -inf
+    else: return 0
+
+class Agent_alpha_beta():
+    def __init__(self, weight : list, board : chess.Board, depth):
+        self.pawnWeight = weight[0]
+        self.knightWeight = weight[1]
+        self.bishopWeight = weight[2]
+        self.rookWeight = weight[3]
+        self.queenWeight = weight[4]
+        self.kingWeight = 3
+        self.pawnAdvance = 1
+        self.checkmate = weight[5]
+        self.board = board
+        self.depth = depth
+        #we will get protective stuff, folk piece, checkmate significant etcetera,... later
+    
+    def count_pieces(self):
+        cnt = 0
+        for i in range(64):
+            if self.board.piece_at(i):
+                cnt += 1
+        return cnt  
+    
+    def getScore(self):
+        score = 0
+        for i in range (0,64):
+            piece = self.board.piece_at(i)
+            if (piece is None): continue
+            color = 1
+            base = 0
+            if (piece.color == False): color = -1
+            if (piece.piece_type == chess.PAWN):
+                if (piece.color == True):
+                    base = self.pawnWeight + self.pawnAdvance*(i//8 - 1)
+                else:
+                    base = self.pawnWeight + self.pawnAdvance*(6 - i//8)
+            if (piece.piece_type == chess.KNIGHT): base = self.knightWeight
+            if (piece.piece_type == chess.BISHOP): base = self.bishopWeight
+            if (piece.piece_type == chess.ROOK): base = self.rookWeight
+            if (piece.piece_type == chess.QUEEN): base = self.queenWeight
+
+            if color > 0:
+                score += color * piece_value[piece.piece_type][i]
+            else:
+                score += color * piece_value[piece.piece_type][(7-i//8)*8+i%8]
+
+        return score
+
+    # Minimax algorithm with Alpha-Beta Pruning
+    def minimax(self, depth, alpha, beta, maximizing_player):
+        if depth == 0 or self.board.is_game_over():
+            return self.getScore()
+        
+        legal_moves = list(self.board.legal_moves)
+        # random.shuffle(legal_moves)
+        if maximizing_player:
+            max_eval = float("-inf")
+            for move in legal_moves:
+                self.board.push(move)
+                eval = self.minimax(depth - 1, alpha, beta, False)
+                self.board.pop()
+                max_eval = max(max_eval, eval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return max_eval
+        else:
+            min_eval = float("inf")
+            for move in legal_moves:
+                self.board.push(move)
+                eval = self.minimax(depth - 1, alpha, beta, True)
+                self.board.pop()
+                min_eval = min(min_eval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+            return min_eval
+
+    # Find the best move using Minimax with Alpha-Beta Pruning
+    def best_move(self, maximizing_player):
+        best_move = None
+        legal_moves = list(self.board.legal_moves)
+        random.shuffle(legal_moves)
+        # print(sellegal_moves)
+        
+       
+        if maximizing_player:
+            max_eval = float("-inf")
+            for move in legal_moves:
+                self.board.push(move)
+                eval = self.minimax(self.depth + 4-self.count_pieces()//8, float("-inf"), float("inf"), False)
+                self.board.pop()
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
+        else:
+            min_eval = float("inf")
+            for move in legal_moves:
+                self.board.push(move)
+                eval = self.minimax(self.depth + 4-self.count_pieces()//8, float("-inf"), float("inf"), True)
+                self.board.pop()
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+        return best_move
+
+
+class Agent_pruning_best2():
+    def __init__(self, weight : list, board : chess.Board, depth):
+        self.pawnWeight = weight[0]
+        self.knightWeight = weight[1]
+        self.bishopWeight = weight[2]
+        self.rookWeight = weight[3]
+        self.queenWeight = weight[4]
+        self.kingWeight = 3000
+        self.pawnAdvance = 1
+        self.checkmate = weight[5]
+        self.board = board
+        self.depth = depth
+        #we will get protective stuff, folk piece, checkmate significant etcetera,... later
+
+    def getScore(self):
+        score = 0
+        for i in range (0,64):
+            piece = self.board.piece_at(i)
+            if (piece is None): continue
+            color = 1
+            base = 0
+            if (piece.color == False): color = -1
+            if (piece.piece_type == chess.PAWN):
+                if (piece.color == True):
+                    base = self.pawnWeight + self.pawnAdvance*(i//8 - 1)
+                else:
+                    base = self.pawnWeight + self.pawnAdvance*(6 - i//8)
+            if (piece.piece_type == chess.KNIGHT): base = self.knightWeight
+            if (piece.piece_type == chess.BISHOP): base = self.bishopWeight
+            if (piece.piece_type == chess.ROOK): base = self.rookWeight
+            if (piece.piece_type == chess.QUEEN): base = self.queenWeight
+
+            score += color * base 
+
+        return score
+
+    def make_next_move(self, depth, best2_score):
+        if (self.board.is_game_over()):
+            return detect_end_score(self.board)
+        if (depth == self.depth): return self.getScore()
+        current_turn = self.board.turn
+
+        if (depth == 0):
+            if (current_turn == True): best2_score = -inf
+            else: best2_score = inf
+
+        if (depth == 2):
+            current_2score = self.getScore()
+            if (current_turn == True):
+                if (current_2score > best2_score):
+                    best2_score = current_2score
+                elif (current_2score < best2_score):
+                    return -inf
+            else:
+                if (current_2score > best2_score):
+                    return inf
+                elif (current_2score < best2_score):
+                    best2_score = current_2score
+
+        legal_move = list(self.board.legal_moves)
+
+
+
+        highest_score = -inf
+        highest_move = legal_move[0]
+
+        lowest_score = inf
+        lowest_move = legal_move[0]
+        for move in legal_move:
+
+            self.board.push(move)
+            next_score = self.make_next_move(depth + 1,best2_score)
+            self.board.pop()
+
+            if (next_score > highest_score):
+                highest_score = next_score
+                highest_move = move
+            if (next_score < lowest_score):
+                lowest_score = next_score
+                lowest_move = move
+
+        #print(highest_score,'x',lowest_score)
+        #exit(0)
+        if (depth > 0):
+            if (self.board.turn == True): return highest_score
+            else: return lowest_score
+
+        else:
+            if (self.board.turn == True): return highest_move
+            else: return lowest_move 
+
 board = chess.Board()
+chess_weight_standard = [1,3,3,5,9,1]
+agent_2 = Agent_pruning_best2(weight = chess_weight_standard,board = board, depth = 3)
+agent_1 = Agent_alpha_beta(weight = chess_weight_standard,board = board, depth = 3)
+step = 0
 
-# Main game loop
-while not board.is_game_over():
-    best_move_white = best_move(board, depth=3)  # Adjust depth for AI strength
-    board.push(best_move_white)
-    # print("White's move:", best_move_white)
-    continue 
-    if board.turn == chess.WHITE:
-        # White's turn
-        best_move_white = best_move(board, depth=3)  # Adjust depth for AI strength
-        board.push(best_move_white)
-        print("White's move:", best_move_white)
-    else:
-        # Black's turn (random move for simplicity)
-        legal_moves = list(board.legal_moves)
-        random_move = random.choice(legal_moves)
-        your_move = random_move
-        # your_move = input("Your move: ")
-        while not your_move in legal_moves:
-            your_move = input("Your move illegal. Move again: ")    
-        board.push(your_move)
-        print("Black's move:", your_move)
-
+while(not board.is_game_over() and step <= 5000):
+    bot_move1 = agent_1.best_move(True)
+    # i have to modified this a litte bit, how can we completely get rid of best2_score params ?
+    print("Player1: ", bot_move1)
+    board.push(bot_move1)
+    # print(agent_2.board)
+    #print('--------------------------------')
+    #print(board)
+    if board.is_game_over():
+        break
+    bot_move2 = agent_2.make_next_move(0, 0)
+    print("Player2: ",bot_move2)
+    board.push(bot_move2)
+    #print('--------------------------------')
+    #print(board)
+    step += 1
+    # print(f'Score at step {step} is :',agent1.getScore())
 # Print the final board
 print(board)
 
