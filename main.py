@@ -5,7 +5,10 @@ from PIL import Image, ImageTk
 from AlphaBetaPruning import *
 from GameInstance import GameInstance
 import fen_settings as s
-from agent_no_pruning_2 import Agent_pruning_best2 
+from agent_no_pruning_2 import Agent_alphabeta_best2 
+from agent_no_pruning import Agent_pruning_best2
+from agent_no_pruning import Agent_alpha_beta
+from hanhai import HA_alpha_beta
 
 import chess
 import chess.engine
@@ -353,14 +356,16 @@ def getAIMove(turn):
     global p1
     global p2
     global g_board
-    global engine 
+    global engine_1
+    global engine_2
 
     lastpvmovestr = ""
     # if (p1 == "AI" and board.turn): engine = engine1
     # elif (p2 == "AI" and not board.turn): engine = engine2
-
-
-    move = engine.make_next_move(0, 0)
+    if g_board.turn:
+        move = engine_1.make_next_move()
+    else:
+        move = engine_1.make_next_move()
     # print("Move: ", move)
     if g_board.is_game_over():
         gameStateVar.set("End of game.")
@@ -488,8 +493,8 @@ def main():
     global clickDragging
     global flipped
     global gameStateVar, gameStateLabel
-    global engine1
-    global engine
+    global engine_1
+    global engine_2
     global keeprunning
     global gameinprogerss
 
@@ -499,8 +504,6 @@ def main():
     clickDragging = False
 
     root = tk.Tk()
-
-    # position/dimensions for main tk frame
     x = 100
     y = 100
     w = 687
@@ -528,18 +531,19 @@ def main():
     gameStateLabel.pack()
     gameStateLabel.place(x=0, y=480)
     chess_weight_standard = [1,3,3,5,9,1]
+    HA_chess_weight_standard = [100,280,320,479,929,60000, 1000000000]
 
-    p1 = "Human"
+    p1 = "AI"
     p2 = "AI"
-    if p1 == "AI" or p2 == "AI":
-        engine = Agent_pruning_best2(weight = chess_weight_standard,board = g_board, depth = 3)
+
+    if p1 == "AI":
+        engine_2 = Agent_alphabeta_best2(weight = chess_weight_standard,board = g_board, depth = 3)    
+    if p2 == "AI":
+        engine_1 = Agent_pruning_best2(weight = HA_chess_weight_standard,board = g_board, depth = 3)
 
     initGame(p1, p2)
-    # root.update()
-
     drawBoard()
     drawPieces()
-    # root.after(1, mainloop())
 
     root.protocol("WM_DELETE_WINDOW", on_closing)
     root.mainloop()
@@ -549,24 +553,13 @@ def on_closing():
     global root
     global engine1
     global engine2
-    # if (p1 == "AI"): engine1.close()
-    # if (p2 == "AI"): engine2.close()
     root.destroy()
 
 
 def initGame(player1, player2):
-    # global board
     global gameinprogress
     global gameStateVar
     global g_board
-
-    
-    # test_fen = 'bn6/1q6/2r5/8/8/5R2/5NQ1/7B w - - 0 1'
-    # test_fen = 'nnnnnnnn/bbbbbbbb/nnnnnnnn/bbbbbbbb/BBBBBBBB/NNNNNNNN/BBBBBBBB/NNNNNNNN w - - 0 1'  # lol
-    # test_fen = 'rnbq1bnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQ1BNR w - - 0 1'
-    # test_fen = '4k3/8/8/8/8/8/8/2KQR3 w - - 0 1'
-    test_fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 0'
-    # board = GameInstance(starting_fen=test_fen)
 
     gameinprogress = True
     gameStateVar.set("White to move.")

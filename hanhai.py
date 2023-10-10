@@ -1,3 +1,4 @@
+
 import chess
 import chess.svg
 import random
@@ -69,30 +70,34 @@ print(board)
 
 ###--------------------------Here come the code-----------------------###
 piece_value = {
-    chess.PAWN: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, -3, -3, 0, 1, 1, 1, -1, -2, 0, 0, -2, -1, 1, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 1, 1, 2, 3, 3, 2, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-    chess.KNIGHT: [-50, -40, -30, -30, -30, -30, -40, -50, -40, -20, 0, 5, 5, 0, -20, -40, -30, 5, 10, 15, 15, 10, 5, -30, -30, 0, 15, 20, 20, 15, 0, -30, -30, 5, 15, 20, 20, 15, 5, -30, -30, 0, 10, 15, 15, 10, 0, -30, -40, -20, 0, 0, 0, 0, -20, -40, -50, -40, -30, -30, -30, -30, -40, -50],
-    chess.BISHOP: [-20, -10, -10, -10, -10, -10, -10, -20, -10, 5, 0, 0, 0, 0, 5, -10, -10, 10, 10, 10, 10, 10, 10, -10, -10, 0, 10, 10, 10, 10, 0, -10, -10, 5, 5, 10, 10, 5, 5, -10, -10, 0, 5, 10, 10, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -10, -10, -10, -10, -20],
-    chess.ROOK: [0, 0, 0, 5, 5, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, 5, 10, 10, 10, 10, 10, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-    chess.QUEEN: [-20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 5, 0, 0, 0, 0, -10, -10, 5, 5, 5, 5, 5, 0, -10, 0, 0, 5, 5, 5, 5, 0, -5, -5, 0, 5, 5, 5, 5, 0, -5, -10, 0, 5, 5, 5, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -5, -5, -10, -10, -20],
-    chess.KING: [-30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -20, -30, -30, -40, -40, -30, -30, -20, -10, -20, -20, -20, -20, -20, -20, -10, 20, 20, 0, 0, 0, 0, 20, 20, 20, 30, 10, 0, 0, 10, 30, 20]  # King value is often set to 0 in simple evaluations
+    chess.PAWN:[0, 0, 0, 0, 0, 0, 0, 0, -31, 3, -14, -36, -37, -7, 8, -31, -19, 3, -2, -10, -11, 5, 9, -22, -23, 0, 1, 6, 9, 10, 3, -26, -13, 15, 0, 14, 15, -2, 16, -17, 7, 44, 31, 40, 44, 21, 29, 7, 90, 85, 82, 102, 73, 86, 83, 78, 100, 100, 100, 105, 100, 100, 100, 100],
+    chess.KNIGHT: [-69, -22, -35, -19, -24, -26, -23, -74, -20, -23, 0, 2, 0, 2, -15, -23, -14, 11, 15, 18, 22, 13, 10, -18, 0, 2, 35, 22, 21, 31, 5, -1, 17, 25, 41, 33, 37, 45, 24, 24, -2, 62, 27, 73, 74, 1, 67, 10, -14, -4, 62, 4, -36, 100, -6, -3, -70, -58, -55, -10, -75, -75, -53, -66],
+    chess.BISHOP: [-10, -10, -15, -14, -12, -15, 2, -7, 16, 20, 6, 7, 6, 11, 20, 19, 15, 20, 25, 8, 15, 24, 25, 14, 7, 0, 16, 17, 23, 17, 10, 13, 10, 15, 25, 26, 34, 20, 17, 25, -14, 28, -10, 52, 41, -32, 39, -9, -22, 2, 31, -39, -42, 35, 20, -11, -50, -37, -107, -23, -76, -82, -78, -59],
+    chess.ROOK: [-32, -31, -18, -2, 5, -18, -24, -30, -53, -44, -43, -29, -26, -31, -38, -53, -46, -26, -35, -25, -25, -42, -28, -42, -30, -46, -29, -13, -21, -16, -35, -28, -6, -9, -4, 18, 13, 16, 5, 0, 15, 25, 27, 45, 33, 28, 35, 19, 60, 34, 62, 55, 67, 56, 29, 55, 50, 56, 33, 37, 4, 33, 29, 35],
+    chess.QUEEN: [-42, -34, -36, -31, -13, -31, -30, -39, -38, -21, -15, -15, -19, 0, -18, -36, -27, -16, -11, -16, -11, -13, -6, -30, -22, -20, -10, -1, -5, -2, -15, -14, -6, -13, 20, 25, 17, 22, -16, 1, 2, 43, 63, 72, 60, 32, 43, -2, 24, 57, 76, 20, -10, 60, 32, 14, 26, 88, 24, 69, -104, -8, 1, 6],
+    chess.KING: [18, 40, -1, 6, -14, -3, 30, 17, 4, 13, -18, -57, -50, -14, 3, -4, -32, -29, -32, -64, -79, -43, -42, -47, -50, -8, -47, -51, -28, -52, -43, -55, -49, 0, 13, -19, -4, 11, 50, -55, -31, 37, 28, -67, 44, -57, 12, -62, 3, 10, 55, 56, 56, 55, 10, -32, -62, 83, 60, -99, -99, 47, 54, 4] # King value is often set to 0 in simple evaluations
 }
-
+def cmp_func(a,b):
+    if (a[1] > b[1]): return 1
+    else: return -1
+from functools import cmp_to_key
+cmp_key = cmp_to_key(cmp_func)
 def detect_end_score(board):
     outcome = board.outcome()
     if (outcome.winner == True): return inf
     elif (outcome.winner == False): return -inf
     else: return 0
 
-class Agent_alpha_beta():
+class HA_alpha_beta():
     def __init__(self, weight : list, board : chess.Board, depth):
         self.pawnWeight = weight[0]
         self.knightWeight = weight[1]
         self.bishopWeight = weight[2]
         self.rookWeight = weight[3]
         self.queenWeight = weight[4]
-        self.kingWeight = 3
+        self.kingWeight = weight[5]
         self.pawnAdvance = 1
-        self.checkmate = weight[5]
+        self.checkmate = weight[6]
         self.board = board
         self.depth = depth
         #we will get protective stuff, folk piece, checkmate significant etcetera,... later
@@ -125,110 +130,7 @@ class Agent_alpha_beta():
             if color > 0:
                 score += color * base *  piece_value[piece.piece_type][i]
             else:
-                score += color * base *  piece_value[piece.piece_type][i]
-
-        return score
-
-    # Minimax algorithm with Alpha-Beta Pruning
-    def minimax(self, depth, alpha, beta):
-        if (self.board.is_game_over()):
-            return detect_end_score(self.board)
-        if (depth == self.depth): return self.getScore()
-
-        maximizing_player = self.board.turn
-        
-        legal_moves = list(self.board.legal_moves)
-        best_move = legal_moves[0]
-        # random.shuffle(legal_moves)
-        if maximizing_player:
-            max_eval = -inf
-            for move in legal_moves:
-                self.board.push(move)
-                eval = self.minimax(depth + 1, alpha, beta)
-                self.board.pop()
-                if eval > max_eval:
-                    max_eval = eval
-                    best_move = move
-                alpha = max(alpha, eval)
-                if beta <= alpha:
-                    break
-            if (depth == 0): return best_move
-            else: return max_eval
-        else:
-            min_eval = inf
-            for move in legal_moves:
-                self.board.push(move)
-                eval = self.minimax(depth + 1, alpha, beta)
-                self.board.pop()
-                if eval < min_eval:
-                    min_eval = eval
-                    best_move = move
-                beta = min(beta, eval)
-                if beta <= alpha:
-                    break
-            if (depth == 0): return best_move
-            else: return min_eval
-
-    # Find the best move using Minimax with Alpha-Beta Pruning
-    def make_next_move(self):
-        return self.minimax(0,-inf,inf)
-
-import chess
-import chess.svg
-import random
-inf = 1000000
-
-board = chess.Board(chess.STARTING_BOARD_FEN)
-def detect_end_score(board):
-    outcome = board.outcome()
-    if (outcome.winner == True): return inf
-    elif (outcome.winner == False): return -inf
-    else: return 0
-
-def cmp_func(a,b):
-    if (a[1] > b[1]): return 1
-    else: return -1
-from functools import cmp_to_key
-cmp_key = cmp_to_key(cmp_func)
-
-class Agent_pruning_best2():
-    def __init__(self, weight : list, board : chess.Board, depth):
-        self.pawnWeight = weight[0]
-        self.knightWeight = weight[1]
-        self.bishopWeight = weight[2]
-        self.rookWeight = weight[3]
-        self.queenWeight = weight[4]
-        self.kingWeight = 3000
-        self.pawnAdvance = 1
-        self.checkmate = weight[5]
-        self.board = board
-        self.depth = depth
-        #we will get protective stuff, folk piece, checkmate significant etcetera,... later
-
-    def getScore(self):
-        score = 0
-        for i in range (0,64):
-            piece = self.board.piece_at(i)
-            if (piece is None): continue
-            color = 1
-            base = 0
-            if (piece.color == False): color = -1
-            if (piece.piece_type == chess.PAWN):
-                if (piece.color == True):
-                    cell_advanced = self.pawnAdvance*(i//8 - 1)
-                else:
-                    cell_advanced = self.pawnAdvance*(6 - i//8)
-
-                if (cell_advanced > 0 and cell_advanced <= 2): base += 1  # case 0 1 2
-                if (cell_advanced > 2 and cell_advanced < 5): base += 2  # case 3 4
-                if (cell_advanced == 5): base += 4  # case 5, pawn become extrem dangerous
-                base += self.pawnWeight
-            if (piece.piece_type == chess.KNIGHT): base = self.knightWeight
-            if (piece.piece_type == chess.BISHOP): base = self.bishopWeight
-            if (piece.piece_type == chess.ROOK): base = self.rookWeight
-            if (piece.piece_type == chess.QUEEN): base = self.queenWeight
-
-            score += color * base 
+                score += color * base *  piece_value[piece.piece_type][63-i]
 
         return score
 
@@ -256,7 +158,7 @@ class Agent_pruning_best2():
                     best2_score = current_2score
 
         legal_move = list(self.board.legal_moves)
-        random.shuffle(legal_move)
+
         tmp_array = []
 
         #sort by immediate score, dont try to make a sudden fucked move

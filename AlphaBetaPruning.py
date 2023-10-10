@@ -246,9 +246,7 @@ def getPieceValue(piece):
 
 
 def getPieceSqauareBonus(piece, position, is_maximizing):
-    if not is_maximizing:
-        position = 63 - position
-    pos = 64 - (position // 8 + 1) * 8 + position - (position // 8) * 8  # TODO - fix this, think it is wrong!
+    pos = (7-position // 8) * 8 + position % 8  # TODO - fix this, think it is wrong!
     # print(piece, position,pos, bonus_dict[piece.upper()][pos])
     return BOUNDS_DICT[piece.upper()][pos]
 
