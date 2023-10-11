@@ -77,19 +77,19 @@ def drawPieces():
                 color = 'b'
         
             if color == 'w':
-                if (piece.piece_type == chess.ROOK): pieceFile = 'pieces/WR.png'  # white rook
-                if (piece.piece_type == chess.KNIGHT): pieceFile = 'pieces/WN.png'  # white knight
-                if (piece.piece_type == chess.BISHOP): pieceFile = 'pieces/WB.png'  # white bishop
-                if (piece.piece_type == chess.QUEEN): pieceFile = 'pieces/WQ.png'  # white queen
-                if (piece.piece_type == chess.KING): pieceFile = 'pieces/WK.png'  # white king
-                if (piece.piece_type == chess.PAWN): pieceFile = 'pieces/WP.png'  # white pawn
+                if (piece.piece_type == chess.ROOK): pieceFile = 'texture/WR.png'  # white rook
+                if (piece.piece_type == chess.KNIGHT): pieceFile = 'texture/WN.png'  # white knight
+                if (piece.piece_type == chess.BISHOP): pieceFile = 'texture/WB.png'  # white bishop
+                if (piece.piece_type == chess.QUEEN): pieceFile = 'texture/WQ.png'  # white queen
+                if (piece.piece_type == chess.KING): pieceFile = 'texture/WK.png'  # white king
+                if (piece.piece_type == chess.PAWN): pieceFile = 'texture/WP.png'  # white pawn
             elif color == 'b':
-                if (piece.piece_type == chess.ROOK): pieceFile = 'pieces/BR.png'  # black rook
-                if (piece.piece_type == chess.KNIGHT): pieceFile = 'pieces/BN.png'  # black knight
-                if (piece.piece_type == chess.BISHOP): pieceFile = 'pieces/BB.png'  # black bishop
-                if (piece.piece_type == chess.QUEEN): pieceFile = 'pieces/BQ.png'  # black queen
-                if (piece.piece_type == chess.KING): pieceFile = 'pieces/BK.png'  # black king
-                if (piece.piece_type == chess.PAWN): pieceFile = 'pieces/BP.png'  # black pawn
+                if (piece.piece_type == chess.ROOK): pieceFile = 'texture/BR.png'  # black rook
+                if (piece.piece_type == chess.KNIGHT): pieceFile = 'texture/BN.png'  # black knight
+                if (piece.piece_type == chess.BISHOP): pieceFile = 'texture/BB.png'  # black bishop
+                if (piece.piece_type == chess.QUEEN): pieceFile = 'texture/BQ.png'  # black queen
+                if (piece.piece_type == chess.KING): pieceFile = 'texture/BK.png'  # black king
+                if (piece.piece_type == chess.PAWN): pieceFile = 'texture/BP.png'  # black pawn
 
         if (pieceFile != ''):
             img = Image.open(pieceFile)
@@ -142,7 +142,7 @@ def drawBoard():
     global scalew, scaleh
     count = 0
     # img = Image.Open(file='board.PNG')
-    img = Image.open("board_2.png")
+    img = Image.open("texture/board_2.png")
     img = img.resize((canvasSize, canvasSize), Image.ANTIALIAS)
     boardImg = ImageTk.PhotoImage(img)
     # boardImg.config(file='board.PNG')
@@ -455,19 +455,19 @@ def redrawTile(x, y):
             color = 'b'
     
         if color == 'w':
-            if (piece.piece_type == chess.ROOK): pieceFile = 'pieces/WR.png'  # white rook
-            if (piece.piece_type == chess.KNIGHT): pieceFile = 'pieces/WN.png'  # white knight
-            if (piece.piece_type == chess.BISHOP): pieceFile = 'pieces/WB.png'  # white bishop
-            if (piece.piece_type == chess.QUEEN): pieceFile = 'pieces/WQ.png'  # white queen
-            if (piece.piece_type == chess.KING): pieceFile = 'pieces/WK.png'  # white king
-            if (piece.piece_type == chess.PAWN): pieceFile = 'pieces/WP.png'  # white pawn
+            if (piece.piece_type == chess.ROOK): pieceFile = 'texture/WR.png'  # white rook
+            if (piece.piece_type == chess.KNIGHT): pieceFile = 'texture/WN.png'  # white knight
+            if (piece.piece_type == chess.BISHOP): pieceFile = 'texture/WB.png'  # white bishop
+            if (piece.piece_type == chess.QUEEN): pieceFile = 'texture/WQ.png'  # white queen
+            if (piece.piece_type == chess.KING): pieceFile = 'texture/WK.png'  # white king
+            if (piece.piece_type == chess.PAWN): pieceFile = 'texture/WP.png'  # white pawn
         elif color == 'b' and piece:
-            if (piece.piece_type == chess.ROOK): pieceFile = 'pieces/BR.png'  # black rook
-            if (piece.piece_type == chess.KNIGHT): pieceFile = 'pieces/BN.png'  # black knight
-            if (piece.piece_type == chess.BISHOP): pieceFile = 'pieces/BB.png'  # black bishop
-            if (piece.piece_type == chess.QUEEN): pieceFile = 'pieces/BQ.png'  # black queen
-            if (piece.piece_type == chess.KING): pieceFile = 'pieces/BK.png'  # black king
-            if (piece.piece_type == chess.PAWN): pieceFile = 'pieces/BP.png'  # black pawn
+            if (piece.piece_type == chess.ROOK): pieceFile = 'texture/BR.png'  # black rook
+            if (piece.piece_type == chess.KNIGHT): pieceFile = 'texture/BN.png'  # black knight
+            if (piece.piece_type == chess.BISHOP): pieceFile = 'texture/BB.png'  # black bishop
+            if (piece.piece_type == chess.QUEEN): pieceFile = 'texture/BQ.png'  # black queen
+            if (piece.piece_type == chess.KING): pieceFile = 'texture/BK.png'  # black king
+            if (piece.piece_type == chess.PAWN): pieceFile = 'texture/BP.png'  # black pawn
     if (pieceFile != ''):
         # app.img[count] = ImageTk.PhotoImage(file=pieceFile)
         # boardCanvas.create_image((xpos), (ypos), image=app.img[count], anchor=NW)
@@ -480,7 +480,7 @@ def redrawTile(x, y):
     pass
 
 
-def main():
+def main(player1, player2):
     global p1
     global p2
     global p1engine, p2engine
@@ -532,8 +532,8 @@ def main():
     chess_weight_standard = [1,3,3,5,9,1]
     HA_chess_weight_standard = [100,280,320,479,929,100,1000000000]
 
-    p1 = "AI"
-    p2 = "AI"
+    p1 = player1
+    p2 = player2
 
     if p1 == "AI":
         engine_1 = Agent_pruning_best2(weight = chess_weight_standard,board = g_board, depth = 3)    
@@ -569,6 +569,8 @@ def initGame(player1, player2):
     elif (p2 == "AI" and not g_board.turn):
         getAIMove(turn='black')
 
-
-main()
+if __name__ == "__main__":
+    p1 = input("Player1: ")
+    p2 = input("Player2: ")
+    main(p1, p2)
 # cProfile.run('foo()')

@@ -2,7 +2,7 @@ import chess
 import chess.svg
 import random
 
-inf = 1000000
+inf = 100000000
 
 def detect_end_score(board):
     outcome = board.outcome()
