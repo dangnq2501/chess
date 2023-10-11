@@ -2,6 +2,11 @@
 Game xử dụng thuật toán minimax cùng với alpha-beta pruning tạo AI chơi cờ với bạn
 
 ## Install
+Bạn có thể clone về máy bằng lệnh với git bằng lệnh:
+```
+git clone https://github.com/dangnq2501/chess.git
+```
+Hoặc nếu chưa cài đặt git bạn có thể download
 Để chạy được đồ họa ta cần thư viện Pillow và tkinter bằng cách chạy lệnh sau:
 ```
 pip install Pillow
