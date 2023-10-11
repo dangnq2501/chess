@@ -2,12 +2,10 @@ import tkinter as tk
 from tkinter import *
 import random
 from PIL import Image, ImageTk
-from AlphaBetaPruning import *
 from GameInstance import GameInstance
 import fen_settings as s
 from agent_no_pruning_2 import Agent_alphabeta_best2 
 from agent_no_pruning import Agent_pruning_best2
-from agent_no_pruning import Agent_alpha_beta
 from hanhai import HA_alpha_beta
 
 import chess
@@ -365,7 +363,8 @@ def getAIMove(turn):
     if g_board.turn:
         move = engine_1.make_next_move()
     else:
-        move = engine_1.make_next_move()
+        move = engine_2.make_next_move()
+
     # print("Move: ", move)
     if g_board.is_game_over():
         gameStateVar.set("End of game.")
@@ -531,15 +530,15 @@ def main():
     gameStateLabel.pack()
     gameStateLabel.place(x=0, y=480)
     chess_weight_standard = [1,3,3,5,9,1]
-    HA_chess_weight_standard = [100,280,320,479,929,60000, 1000000000]
+    HA_chess_weight_standard = [100,280,320,479,929,100,1000000000]
 
     p1 = "AI"
     p2 = "AI"
 
     if p1 == "AI":
-        engine_2 = Agent_alphabeta_best2(weight = chess_weight_standard,board = g_board, depth = 3)    
+        engine_1 = Agent_pruning_best2(weight = chess_weight_standard,board = g_board, depth = 3)    
     if p2 == "AI":
-        engine_1 = Agent_pruning_best2(weight = HA_chess_weight_standard,board = g_board, depth = 3)
+        engine_2 = HA_alpha_beta(weight = HA_chess_weight_standard,board = g_board, depth = 3)
 
     initGame(p1, p2)
     drawBoard()

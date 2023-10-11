@@ -31,6 +31,7 @@ class Agent_alphabeta_best2():
         self.checkmate = weight[5]
         self.board = board
         self.depth = depth
+        self.start_state = 4
         # we will get protective stuff, folk piece, checkmate significant etcetera,... later
 
     def count_pieces(self):
@@ -102,8 +103,17 @@ class Agent_alphabeta_best2():
         # sort by immediate score, dont try to make a sudden fucked move
         # -----------------------------
         for move in legal_moves:
+            pos = move.from_square
+            piece = self.board.piece_at(pos)
+            behind_piece = None 
+            if 0 <= pos - 8 and pos - 8 < 64 and self.board.piece_at(pos-8):
+                behind_piece = self.board.piece_at(pos-8)
+            if 0 <= pos + 8 and pos + 8 < 64 and self.board.piece_at(pos+8):
+                behind_piece = self.board.piece_at(pos+8)
+            # 3 first move only use knight and pawn in front of king
             self.board.push(move)
-            tmp_array.append((move, self.getScore()))
+            if self.start_state == 0 or ((pos < 16 or pos > 48) and self.start_state > 0 and (piece.piece_type == chess.KNIGHT or (piece.piece_type == chess.PAWN   and behind_piece and behind_piece.piece_type == chess.KING ))):
+                tmp_array.append((move, self.getScore()))
             self.board.pop()
         tmp_array = list(tmp_array)
         tmp_array.sort(key=cmp_key)
@@ -148,5 +158,12 @@ class Agent_alphabeta_best2():
 
     # Find the best move using Minimax with Alpha-Beta Pruning
     def make_next_move(self):
-        return self.minimax(0, -inf, inf,0)
+        if self.start_state > 0:
+            self.start_state -= 1
+        return self.minimax(0, -inf, inf, 0)
 
+if __name__ == "__main__":
+    board = chess.Board()
+    chess_weight_standard = [1,3,3,5,9,1]
+    engine = Agent_alphabeta_best2(chess_weight_standard, board, 3)
+    print(engine.make_next_move())

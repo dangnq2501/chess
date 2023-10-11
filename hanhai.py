@@ -71,7 +71,10 @@ print(board)
 ###--------------------------Here come the code-----------------------###
 piece_value = {
     chess.PAWN:[0, 0, 0, 0, 0, 0, 0, 0, -31, 3, -14, -36, -37, -7, 8, -31, -19, 3, -2, -10, -11, 5, 9, -22, -23, 0, 1, 6, 9, 10, 3, -26, -13, 15, 0, 14, 15, -2, 16, -17, 7, 44, 31, 40, 44, 21, 29, 7, 90, 85, 82, 102, 73, 86, 83, 78, 100, 100, 100, 105, 100, 100, 100, 100],
-    chess.KNIGHT: [-69, -22, -35, -19, -24, -26, -23, -74, -20, -23, 0, 2, 0, 2, -15, -23, -14, 11, 15, 18, 22, 13, 10, -18, 0, 2, 35, 22, 21, 31, 5, -1, 17, 25, 41, 33, 37, 45, 24, 24, -2, 62, 27, 73, 74, 1, 67, 10, -14, -4, 62, 4, -36, 100, -6, -3, -70, -58, -55, -10, -75, -75, -53, -66],
+    chess.KNIGHT: [-69, -22, -35, -19, -24, -26, -23, -74, 
+                   -20, -23, 0, 2, 0, 2, -15, -23, 
+                   -14, 11, 15, 18, 22, 13, 10, -18, 
+                   0, 2, 35, 22, 21, 31, 5, -1, 17, 25, 41, 33, 37, 45, 24, 24, -2, 62, 27, 73, 74, 1, 67, 10, -14, -4, 62, 4, -36, 100, -6, -3, -70, -58, -55, -10, -75, -75, -53, -66],
     chess.BISHOP: [-10, -10, -15, -14, -12, -15, 2, -7, 16, 20, 6, 7, 6, 11, 20, 19, 15, 20, 25, 8, 15, 24, 25, 14, 7, 0, 16, 17, 23, 17, 10, 13, 10, 15, 25, 26, 34, 20, 17, 25, -14, 28, -10, 52, 41, -32, 39, -9, -22, 2, 31, -39, -42, 35, 20, -11, -50, -37, -107, -23, -76, -82, -78, -59],
     chess.ROOK: [-32, -31, -18, -2, 5, -18, -24, -30, -53, -44, -43, -29, -26, -31, -38, -53, -46, -26, -35, -25, -25, -42, -28, -42, -30, -46, -29, -13, -21, -16, -35, -28, -6, -9, -4, 18, 13, 16, 5, 0, 15, 25, 27, 45, 33, 28, 35, 19, 60, 34, 62, 55, 67, 56, 29, 55, 50, 56, 33, 37, 4, 33, 29, 35],
     chess.QUEEN: [-42, -34, -36, -31, -13, -31, -30, -39, -38, -21, -15, -15, -19, 0, -18, -36, -27, -16, -11, -16, -11, -13, -6, -30, -22, -20, -10, -1, -5, -2, -15, -14, -6, -13, 20, 25, 17, 22, -16, 1, 2, 43, 63, 72, 60, 32, 43, -2, 24, 57, 76, 20, -10, 60, 32, 14, 26, 88, 24, 69, -104, -8, 1, 6],
@@ -100,15 +103,8 @@ class HA_alpha_beta():
         self.checkmate = weight[6]
         self.board = board
         self.depth = depth
+        self.start_state = 4
         #we will get protective stuff, folk piece, checkmate significant etcetera,... later
-    
-    def count_pieces(self):
-        cnt = 0
-        for i in range(64):
-            if self.board.piece_at(i):
-                cnt += 1
-        return cnt  
-    
     def getScore(self):
         score = 0
         for i in range (0,64):
@@ -119,18 +115,22 @@ class HA_alpha_beta():
             if (piece.color == False): color = -1
             if (piece.piece_type == chess.PAWN):
                 if (piece.color == True):
-                    base = self.pawnWeight + self.pawnAdvance*(i//8 - 1)
+                    cell_advanced = self.pawnAdvance*(i//8 - 1)
                 else:
-                    base = self.pawnWeight + self.pawnAdvance*(6 - i//8)
+                    cell_advanced = self.pawnAdvance*(6 - i//8)
+
+                if (cell_advanced > 0 and cell_advanced <= 2): base += 1  # case 0 1 2
+                if (cell_advanced > 2 and cell_advanced < 5): base += 2  # case 3 4
+                if (cell_advanced == 5): base += 4  # case 5, pawn become extrem dangerous
+                base += self.pawnWeight
             if (piece.piece_type == chess.KNIGHT): base = self.knightWeight
             if (piece.piece_type == chess.BISHOP): base = self.bishopWeight
             if (piece.piece_type == chess.ROOK): base = self.rookWeight
             if (piece.piece_type == chess.QUEEN): base = self.queenWeight
-
-            if color > 0:
-                score += color * base *  piece_value[piece.piece_type][i]
+            if piece.color:
+                score += color * base * piece_value[piece.piece_type][i]
             else:
-                score += color * base *  piece_value[piece.piece_type][63-i]
+                score += color * base * piece_value[piece.piece_type][(7-i//8)*8+i%8]
 
         return score
 
@@ -158,14 +158,23 @@ class HA_alpha_beta():
                     best2_score = current_2score
 
         legal_move = list(self.board.legal_moves)
-
+        
         tmp_array = []
 
         #sort by immediate score, dont try to make a sudden fucked move
         #-----------------------------
         for move in legal_move:
+            pos = move.from_square
+            piece = self.board.piece_at(pos)
+            behind_piece = None 
+            if 0 <= pos - 8 and pos - 8 < 64 and self.board.piece_at(pos-8):
+                behind_piece = self.board.piece_at(pos-8)
+            if 0 <= pos + 8 and pos + 8 < 64 and self.board.piece_at(pos+8):
+                behind_piece = self.board.piece_at(pos+8)
+            # 3 first move only use knight and pawn in front of king
             self.board.push(move)
-            tmp_array.append((move,self.getScore()))
+            if self.start_state == 0 or ((pos < 16 or pos > 48) and self.start_state > 0 and (piece.piece_type == chess.KNIGHT or (piece.piece_type == chess.PAWN   and behind_piece and behind_piece.piece_type == chess.KING ))):
+                tmp_array.append((move,self.getScore()))
             self.board.pop()
         tmp_array = list(tmp_array)
         tmp_array.sort(key = cmp_key)
@@ -202,4 +211,6 @@ class HA_alpha_beta():
             else: return lowest_move
 
     def make_next_move(self):
+        if self.start_state > 0:
+            self.start_state -= 1
         return self.make_move(0,0)

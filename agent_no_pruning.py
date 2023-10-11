@@ -70,7 +70,10 @@ print(board)
 ###--------------------------Here come the code-----------------------###
 piece_value = {
     chess.PAWN: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, -3, -3, 0, 1, 1, 1, -1, -2, 0, 0, -2, -1, 1, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 1, 1, 2, 3, 3, 2, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-    chess.KNIGHT: [-50, -40, -30, -30, -30, -30, -40, -50, -40, -20, 0, 5, 5, 0, -20, -40, -30, 5, 10, 15, 15, 10, 5, -30, -30, 0, 15, 20, 20, 15, 0, -30, -30, 5, 15, 20, 20, 15, 5, -30, -30, 0, 10, 15, 15, 10, 0, -30, -40, -20, 0, 0, 0, 0, -20, -40, -50, -40, -30, -30, -30, -30, -40, -50],
+    chess.KNIGHT: [-50, -40, -30, -30, -30, -30, -40, -50, 
+                   -40, -20, 0, 5, 5, 0, -20, -40, 
+                   -30, 5, 10, 15, 15, 10, 5, -30, 
+                   -30, 0, 15, 20, 20, 15, 0, -30, -30, 5, 15, 20, 20, 15, 5, -30, -30, 0, 10, 15, 15, 10, 0, -30, -40, -20, 0, 0, 0, 0, -20, -40, -50, -40, -30, -30, -30, -30, -40, -50],
     chess.BISHOP: [-20, -10, -10, -10, -10, -10, -10, -20, -10, 5, 0, 0, 0, 0, 5, -10, -10, 10, 10, 10, 10, 10, 10, -10, -10, 0, 10, 10, 10, 10, 0, -10, -10, 5, 5, 10, 10, 5, 5, -10, -10, 0, 5, 10, 10, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -10, -10, -10, -10, -20],
     chess.ROOK: [0, 0, 0, 5, 5, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, 5, 10, 10, 10, 10, 10, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0],
     chess.QUEEN: [-20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 5, 0, 0, 0, 0, -10, -10, 5, 5, 5, 5, 5, 0, -10, 0, 0, 5, 5, 5, 5, 0, -5, -5, 0, 5, 5, 5, 5, 0, -5, -10, 0, 5, 5, 5, 5, 0, -10, -10, 0, 0, 0, 0, 0, 0, -10, -20, -10, -10, -5, -5, -10, -10, -20],
@@ -95,6 +98,7 @@ class Agent_alpha_beta():
         self.checkmate = weight[5]
         self.board = board
         self.depth = depth
+        self.start_state = 4
         #we will get protective stuff, folk piece, checkmate significant etcetera,... later
     
     def count_pieces(self):
@@ -125,7 +129,7 @@ class Agent_alpha_beta():
             if color > 0:
                 score += color * base *  piece_value[piece.piece_type][i]
             else:
-                score += color * base *  piece_value[piece.piece_type][i]
+                score += color * base *  piece_value[piece.piece_type][(7-i//8)*8+i%8]
 
         return score
 
@@ -136,8 +140,20 @@ class Agent_alpha_beta():
         if (depth == self.depth): return self.getScore()
 
         maximizing_player = self.board.turn
-        
+        tmp = []
         legal_moves = list(self.board.legal_moves)
+        for move in legal_moves:
+            pos = move.from_square
+            piece = self.board.piece_at(pos)
+            behind_piece = None 
+            if 0 <= pos - 8 and pos - 8 < 64 and self.board.piece_at(pos-8):
+                behind_piece = self.board.piece_at(pos-8)
+            if 0 <= pos + 8 and pos + 8 < 64 and self.board.piece_at(pos+8):
+                behind_piece = self.board.piece_at(pos+8)
+            # 3 first move only use knight and pawn in front of king
+            if self.start_state == 0 or ((pos < 16 or pos > 48)  and self.start_state > 0 and (piece.piece_type == chess.KNIGHT or (piece.piece_type == chess.PAWN   and behind_piece and behind_piece.piece_type == chess.KING ))):
+                tmp.append((move,self.getScore()))
+        legal_moves = tmp
         best_move = legal_moves[0]
         # random.shuffle(legal_moves)
         if maximizing_player:
@@ -173,10 +189,6 @@ class Agent_alpha_beta():
     def make_next_move(self):
         return self.minimax(0,-inf,inf)
 
-import chess
-import chess.svg
-import random
-inf = 1000000
 
 board = chess.Board(chess.STARTING_BOARD_FEN)
 def detect_end_score(board):
@@ -203,6 +215,7 @@ class Agent_pruning_best2():
         self.checkmate = weight[5]
         self.board = board
         self.depth = depth
+        self.start_state = 4
         #we will get protective stuff, folk piece, checkmate significant etcetera,... later
 
     def getScore(self):
@@ -256,14 +269,23 @@ class Agent_pruning_best2():
                     best2_score = current_2score
 
         legal_move = list(self.board.legal_moves)
-        random.shuffle(legal_move)
+        
         tmp_array = []
 
         #sort by immediate score, dont try to make a sudden fucked move
         #-----------------------------
         for move in legal_move:
+            pos = move.from_square
+            piece = self.board.piece_at(pos)
+            behind_piece = None 
+            if 0 <= pos - 8 and pos - 8 < 64 and self.board.piece_at(pos-8):
+                behind_piece = self.board.piece_at(pos-8)
+            if 0 <= pos + 8 and pos + 8 < 64 and self.board.piece_at(pos+8):
+                behind_piece = self.board.piece_at(pos+8)
+            # 3 first move only use knight and pawn in front of king
             self.board.push(move)
-            tmp_array.append((move,self.getScore()))
+            if self.start_state == 0 or ((pos < 16 or pos > 48) and self.start_state > 0 and (piece.piece_type == chess.KNIGHT or (piece.piece_type == chess.PAWN   and behind_piece and behind_piece.piece_type == chess.KING ))):
+                tmp_array.append((move,self.getScore()))
             self.board.pop()
         tmp_array = list(tmp_array)
         tmp_array.sort(key = cmp_key)
@@ -300,4 +322,6 @@ class Agent_pruning_best2():
             else: return lowest_move
 
     def make_next_move(self):
+        if self.start_state > 0:
+            self.start_state -= 1
         return self.make_move(0,0)
